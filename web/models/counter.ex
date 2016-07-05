@@ -5,11 +5,11 @@ defmodule Countdown.Counter do
   end
 
   def reset do
-    Agent.update(__MODULE__, fn value -> 0 end, 7500)
+    Agent.update(__MODULE__, fn (value) -> 0 end, 7500)
   end
 
   def value do
-    Agent.get(__MODULE__, fn value -> value end, 7500)
+    Agent.get(__MODULE__, fn (value) -> value end, 7500)
   end
 
   def limit do
@@ -22,6 +22,7 @@ defmodule Countdown.Counter do
       Agent.update(__MODULE__, fn value -> n end, 7500)
       {:ok, n}
     else
+      reset
       {:overflow, 0}
     end
   end
