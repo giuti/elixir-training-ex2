@@ -1,15 +1,14 @@
 defmodule Countdown.Counter do
-
   def start_link do
-    Agent.start_link(fn -> %{value: 0} end, name: __MODULE__)
+    Agent.start_link(fn -> 0 end, name: __MODULE__)
   end
 
   def reset do
-    Agent.update(__MODULE__, fn (value) -> 0 end, 7500)
+    Agent.get_and_update(__MODULE__, fn(n) -> {0, 0} end, 5000)
   end
 
   def value do
-    Agent.get(__MODULE__, fn (value) -> value end, 7500)
+    Agent.get(__MODULE__, fn(n) -> n end, 5000)
   end
 
   def limit do
@@ -17,18 +16,17 @@ defmodule Countdown.Counter do
   end
 
   def count do
-    n = value + 1
-    if n < limit do
-      Agent.update(__MODULE__, fn value -> n end, 7500)
-      {:ok, n}
-    else
-      reset
-      {:overflow, 0}
+    cond do
+      __MODULE__.value + 1 >= __MODULE__.limit -> {:overflow, __MODULE__.reset}
+      true -> {:ok, Agent.get_and_update(__MODULE__, fn(n) -> {n + 1, n + 1} end, 5000)}
     end
   end
 
-  def set(n) do
-    Agent.update(__MODULE__, fn value -> n end, 7500)
+  def set(value) do
+    cond do
+      value >= __MODULE__.limit -> {:overflow, __MODULE__.reset}
+      true -> {:ok, Agent.update(__MODULE__, fn(_n) -> value end, 5000)}
+    end
   end
 end
 
